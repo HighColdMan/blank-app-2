@@ -301,10 +301,10 @@ def do_processing():
     c1, c2, c3 = st.columns(3)
     with c1:
         plt.figure(figsize=(4, 4))
-        plt.plot(lre_eph_['fpr'], lre_eph_['tpr'], label=f'LRE, AUC={lre_eph['auc']:.3f}')
-        plt.plot(lda_eph_['fpr'], lda_eph_['tpr'], label=f'LDA, AUC={lda_eph['auc']:.3f}')
-        plt.plot(ada_eph_['fpr'], ada_eph_['tpr'], label=f'ADA, AUC={ada_eph['auc']:.3f}')
-        plt.plot(mlp_eph_['fpr'], mlp_eph_['tpr'], label=f'MLP, AUC={mlp_eph['auc']:.3f}')
+        plt.plot(lre_eph_['fpr'], lre_eph_['tpr'], label=f"LRE, AUC={lre_eph['auc']:.3f}")
+        plt.plot(lda_eph_['fpr'], lda_eph_['tpr'], label=f"LDA, AUC={lda_eph['auc']:.3f}")
+        plt.plot(ada_eph_['fpr'], ada_eph_['tpr'], label=f"ADA, AUC={ada_eph['auc']:.3f}")
+        plt.plot(mlp_eph_['fpr'], mlp_eph_['tpr'], label=f"MLP, AUC={mlp_eph['auc']:.3f}")
         plt.plot([0, 1], [0, 1], 'k--')
 
         # 设置图像参数
@@ -317,10 +317,10 @@ def do_processing():
         st.pyplot(plt)
     with c2:
         plt.figure(figsize=(4, 4))
-        plt.plot(lre_phe_['fpr'], lre_phe_['tpr'], label=f'LRE, AUC={lre_phe['auc']:.3f}')
-        plt.plot(lda_phe_['fpr'], lda_phe_['tpr'], label=f'LDA, AUC={lda_phe['auc']:.3f}')
-        plt.plot(ada_phe_['fpr'], ada_phe_['tpr'], label=f'ADA, AUC={ada_phe['auc']:.3f}')
-        plt.plot(mlp_phe_['fpr'], mlp_phe_['tpr'], label=f'MLP, AUC={mlp_phe['auc']:.3f}')
+        plt.plot(lre_phe_['fpr'], lre_phe_['tpr'], label=f"LRE, AUC={lre_phe['auc']:.3f}")
+        plt.plot(lda_phe_['fpr'], lda_phe_['tpr'], label=f"LDA, AUC={lda_phe['auc']:.3f}")
+        plt.plot(ada_phe_['fpr'], ada_phe_['tpr'], label=f"ADA, AUC={ada_phe['auc']:.3f}")
+        plt.plot(mlp_phe_['fpr'], mlp_phe_['tpr'], label=f"MLP, AUC={mlp_phe['auc']:.3f}")
         # 设置图像参数
         plt.xlim([0.0, 1.0])
         plt.ylim([0.0, 1.0])
@@ -331,10 +331,10 @@ def do_processing():
         st.pyplot(plt)
     with c3:
         plt.figure(figsize=(4, 4))
-        plt.plot(lre_epi_['fpr'], lre_epi_['tpr'], label=f'LRE, AUC={lre_epi['auc']:.3f}')
-        plt.plot(lda_epi_['fpr'], lda_epi_['tpr'], label=f'LDA, AUC={lda_epi['auc']:.3f}')
-        plt.plot(ada_epi_['fpr'], ada_epi_['tpr'], label=f'ADA, AUC={ada_epi['auc']:.3f}')
-        plt.plot(mlp_epi_['fpr'], mlp_epi_['tpr'], label=f'MLP, AUC={mlp_epi['auc']:.3f}')
+        plt.plot(lre_epi_['fpr'], lre_epi_['tpr'], label=f"LRE, AUC={lre_epi['auc']:.3f}")
+        plt.plot(lda_epi_['fpr'], lda_epi_['tpr'], label=f"LDA, AUC={lda_epi['auc']:.3f}")
+        plt.plot(ada_epi_['fpr'], ada_epi_['tpr'], label=f"ADA, AUC={ada_epi['auc']:.3f}")
+        plt.plot(mlp_epi_['fpr'], mlp_epi_['tpr'], label=f"MLP, AUC={mlp_epi['auc']:.3f}")
         # 设置图像参数
         plt.xlim([0.0, 1.0])
         plt.ylim([0.0, 1.0])
@@ -429,5 +429,3 @@ def setup_selectors():
 if __name__ == "__main__":
     do_processing()
     setup_selectors()
-
-            
