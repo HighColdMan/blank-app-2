@@ -210,7 +210,7 @@ def do_processing():
     global vars
     global lre, lda, ada, mlp
     global COL_INPUT
-    data = pd.read_csv("mydata2.csv")
+    data = pd.read_csv("mydata.csv")
 
     proc_data = process_data(data)
     # 预处理数据
@@ -343,7 +343,7 @@ def do_predict():
     global lre, lda, ada, mlp
     
     scaler = StandardScaler()
-    mydata = pd.read_csv("mydata2.csv")
+    mydata = pd.read_csv("mydata.csv")
     mydata = mydata.drop(columns=['caseid', 'intraop_eph', 'intraop_phe', 'intraop_epi'])
     # print('before:', len(mydata))
 
