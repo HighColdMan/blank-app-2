@@ -9,6 +9,7 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.svm import SVC
 import xgboost as xgb
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
@@ -16,13 +17,8 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.naive_bayes import GaussianNB, MultinomialNB, BernoulliNB
 from sklearn.multioutput import MultiOutputClassifier
 import numpy as np
-# COL_INPUT = [
-#     'age', 'sex', 'bmi', 'asa', 'emop', 'optype', 'preop_dm',
-#     'approach', 'preop_htn', 'preop_pft', 'preop_hb', 'intraop_colloid',
-#     'intraop_ppf'
-#     ]
 
-# COL_STR = []  # ['risk']
+
 COL_INPUT = None
 COL_Y = None
 btn_predict = None
@@ -121,8 +117,6 @@ def process_data(data, train_state=True):
         bmi = case_data['bmi']
         asa = case_data['asa']
         preop_hb = case_data['preop_hb']
-        intraop_ppf = case_data['intraop_ppf']
-        intraop_colloid = case_data['intraop_colloid']
 
         sex = case_data['sex']
         if sex.lower() == 'm':
@@ -206,17 +200,17 @@ def process_data(data, train_state=True):
             proc_data.loc[len(proc_data)] = (case_data["caseid"], intraop_eph, 
                                             intraop_phe, intraop_epi, age, sex, bmi, asa, 
                                             emop, optype, preop_dm, approach, preop_htn, 
-                                            preop_pft, preop_hb, intraop_colloid, intraop_ppf)
+                                            preop_pft, preop_hb)
         else:
             proc_data.loc[len(proc_data)] = (age, sex, bmi, asa, 
                                             emop, optype, preop_dm, approach, preop_htn, 
-                                            preop_pft, preop_hb, intraop_colloid, intraop_ppf)
+                                            preop_pft, preop_hb)
     return proc_data
 def do_processing():
     global vars
     global lre, lda, ada, mlp
     global COL_INPUT
-    data = pd.read_csv("mydata.csv")
+    data = pd.read_csv("mydata2.csv")
 
     proc_data = process_data(data)
     # 预处理数据
@@ -231,7 +225,7 @@ def do_processing():
     scaler = StandardScaler()
     mydata = proc_data
     mydata = pd.get_dummies(proc_data, columns=['sex', 'emop', 'optype', 'preop_dm', 'approach', 'preop_htn', 'preop_pft'])
-    mydata[['age', 'bmi', 'asa', 'preop_hb', 'intraop_ppf', 'intraop_colloid']] = scaler.fit_transform(proc_data[['age', 'bmi', 'asa', 'preop_hb', 'intraop_ppf', 'intraop_colloid']])
+    mydata[['age', 'bmi', 'asa', 'preop_hb']] = scaler.fit_transform(proc_data[['age', 'bmi', 'asa', 'preop_hb']])
 
     # 分割特征和目标变量
     X = mydata.drop(columns=['caseid', 'intraop_eph', 'intraop_phe', 'intraop_epi'])
@@ -241,12 +235,11 @@ def do_processing():
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
 
     # LogisticRegression
-
     lre = LogisticRegression()
     lre = MultiOutputClassifier(lre)
 
     # AdaBoost
-    ada = AdaBoostClassifier(n_estimators=50, random_state=42)
+    ada = AdaBoostClassifier(algorithm='SAMME', n_estimators=10, random_state=42, estimator=DecisionTreeClassifier(max_depth=2, random_state=42, criterion='gini'))
     ada = MultiOutputClassifier(ada)
 
     # 线性判别分析 (Linear Discriminant Analysis, LDA)
@@ -254,7 +247,7 @@ def do_processing():
     lda = MultiOutputClassifier(lda)
 
     # MLP
-    mlp = MLPClassifier(hidden_layer_sizes=[100], max_iter=50, random_state=42)
+    mlp = MLPClassifier(activation='logistic', learning_rate='adaptive', solver='adam', max_iter=500, hidden_layer_sizes=[64, 32, 16], random_state=42)
     
     col1, col2 = st.columns(2)
 
@@ -301,10 +294,10 @@ def do_processing():
     c1, c2, c3 = st.columns(3)
     with c1:
         plt.figure(figsize=(4, 4))
-        plt.plot(lre_eph_['fpr'], lre_eph_['tpr'], label=f"LRE, AUC={lre_eph['auc']:.3f}")
-        plt.plot(lda_eph_['fpr'], lda_eph_['tpr'], label=f"LDA, AUC={lda_eph['auc']:.3f}")
-        plt.plot(ada_eph_['fpr'], ada_eph_['tpr'], label=f"ADA, AUC={ada_eph['auc']:.3f}")
-        plt.plot(mlp_eph_['fpr'], mlp_eph_['tpr'], label=f"MLP, AUC={mlp_eph['auc']:.3f}")
+        plt.plot(lre_eph_['fpr'], lre_eph_['tpr'], label=f'LRE, AUC={lre_eph['auc']:.3f}')
+        plt.plot(lda_eph_['fpr'], lda_eph_['tpr'], label=f'LDA, AUC={lda_eph['auc']:.3f}')
+        plt.plot(ada_eph_['fpr'], ada_eph_['tpr'], label=f'ADA, AUC={ada_eph['auc']:.3f}')
+        plt.plot(mlp_eph_['fpr'], mlp_eph_['tpr'], label=f'MLP, AUC={mlp_eph['auc']:.3f}')
         plt.plot([0, 1], [0, 1], 'k--')
 
         # 设置图像参数
@@ -317,10 +310,10 @@ def do_processing():
         st.pyplot(plt)
     with c2:
         plt.figure(figsize=(4, 4))
-        plt.plot(lre_phe_['fpr'], lre_phe_['tpr'], label=f"LRE, AUC={lre_phe['auc']:.3f}")
-        plt.plot(lda_phe_['fpr'], lda_phe_['tpr'], label=f"LDA, AUC={lda_phe['auc']:.3f}")
-        plt.plot(ada_phe_['fpr'], ada_phe_['tpr'], label=f"ADA, AUC={ada_phe['auc']:.3f}")
-        plt.plot(mlp_phe_['fpr'], mlp_phe_['tpr'], label=f"MLP, AUC={mlp_phe['auc']:.3f}")
+        plt.plot(lre_phe_['fpr'], lre_phe_['tpr'], label=f'LRE, AUC={lre_phe['auc']:.3f}')
+        plt.plot(lda_phe_['fpr'], lda_phe_['tpr'], label=f'LDA, AUC={lda_phe['auc']:.3f}')
+        plt.plot(ada_phe_['fpr'], ada_phe_['tpr'], label=f'ADA, AUC={ada_phe['auc']:.3f}')
+        plt.plot(mlp_phe_['fpr'], mlp_phe_['tpr'], label=f'MLP, AUC={mlp_phe['auc']:.3f}')
         # 设置图像参数
         plt.xlim([0.0, 1.0])
         plt.ylim([0.0, 1.0])
@@ -331,10 +324,10 @@ def do_processing():
         st.pyplot(plt)
     with c3:
         plt.figure(figsize=(4, 4))
-        plt.plot(lre_epi_['fpr'], lre_epi_['tpr'], label=f"LRE, AUC={lre_epi['auc']:.3f}")
-        plt.plot(lda_epi_['fpr'], lda_epi_['tpr'], label=f"LDA, AUC={lda_epi['auc']:.3f}")
-        plt.plot(ada_epi_['fpr'], ada_epi_['tpr'], label=f"ADA, AUC={ada_epi['auc']:.3f}")
-        plt.plot(mlp_epi_['fpr'], mlp_epi_['tpr'], label=f"MLP, AUC={mlp_epi['auc']:.3f}")
+        plt.plot(lre_epi_['fpr'], lre_epi_['tpr'], label=f'LRE, AUC={lre_epi['auc']:.3f}')
+        plt.plot(lda_epi_['fpr'], lda_epi_['tpr'], label=f'LDA, AUC={lda_epi['auc']:.3f}')
+        plt.plot(ada_epi_['fpr'], ada_epi_['tpr'], label=f'ADA, AUC={ada_epi['auc']:.3f}')
+        plt.plot(mlp_epi_['fpr'], mlp_epi_['tpr'], label=f'MLP, AUC={mlp_epi['auc']:.3f}')
         # 设置图像参数
         plt.xlim([0.0, 1.0])
         plt.ylim([0.0, 1.0])
@@ -350,7 +343,7 @@ def do_predict():
     global lre, lda, ada, mlp
     
     scaler = StandardScaler()
-    mydata = pd.read_csv("mydata.csv")
+    mydata = pd.read_csv("mydata2.csv")
     mydata = mydata.drop(columns=['caseid', 'intraop_eph', 'intraop_phe', 'intraop_epi'])
     # print('before:', len(mydata))
 
@@ -362,7 +355,7 @@ def do_predict():
     st.write(input.iloc[-1])
     # print('before:', input.head)
     input = pd.get_dummies(proc_data, columns=['sex', 'emop', 'optype', 'preop_dm', 'approach', 'preop_htn', 'preop_pft'])
-    input[['age', 'bmi', 'asa', 'preop_hb', 'intraop_ppf', 'intraop_colloid']] = scaler.fit_transform(proc_data[['age', 'bmi', 'asa', 'preop_hb', 'intraop_ppf', 'intraop_colloid']])
+    input[['age', 'bmi', 'asa', 'preop_hb']] = scaler.fit_transform(proc_data[['age', 'bmi', 'asa', 'preop_hb']])
     # print('after:', input.head)
     # print(input.tail(1))
     
@@ -376,13 +369,7 @@ def do_predict():
     st.markdown(f":rainbow[The prediction results of model LDA for intraop_eph/phe/epi are:({np.round(lda_res[0], 3)}, {np.round(lda_res[1], 3)}, {np.round(lda_res[2], 3)})]")
     st.markdown(f":rainbow[The prediction results of model ADA for intraop_eph/phe/epi are:({np.round(ada_res[0], 3)}, {np.round(ada_res[1], 3)}, {np.round(ada_res[2], 3)})]")
     st.markdown(f":rainbow[The prediction results of model MLP for intraop_eph/phe/epi are:({np.round(mlp_res[0], 3)}, {np.round(mlp_res[1], 3)}, {np.round(mlp_res[2], 3)})]")
-    # st.markdown(":rainbow[The prediction results of model LRE for intraop_eph/phe/epi are]:", f"({lre_res[0]}, {lre_res[1]}, {lre_res[2]})")
-    # st.markdown(":rainbow[The prediction results of model LRE for intraop_eph/phe/epi are]:", f"({lda_res[0]}, {lda_res[1]}, {lda_res[2]})")
-    # st.markdown(":rainbow[The prediction results of model LRE for intraop_eph/phe/epi are]:", f"({ada_res[0]}, {ada_res[1]}, {ada_res[2]})")
-    # st.markdown(":rainbow[The prediction results of model LRE for intraop_eph/phe/epi are]:", f"({mlp_res[0]}, {mlp_res[1]}, {mlp_res[2]})")
 
-    
-    
 
 
 def setup_selectors():
@@ -394,8 +381,6 @@ def setup_selectors():
         bmi = st.slider('bmi', 0, 50)
         asa = st.slider("asa", 0, 4)
         preop_hb = st.slider("preophb", 0, 100)
-        intraop_colloid = st.slider("intraop_colloid", 0, 1000)
-        intraop_ppf = st.slider("intraop_ppf", 0, 1000)
         sex = st.radio("sex", ["M", "F"])
         emop = st.radio("emop", ["N", "Y"])
         
@@ -403,23 +388,14 @@ def setup_selectors():
         preop_dm = st.radio("preop_dm", ["N", "Y"])
         preop_htn = st.radio("preop_htn", ["N", "Y"])
         preop_pft = st.radio("preop_pft", ["Normal", "Others"])
-        approach = st.radio("approach", ["open", "videoscopi", "robotic"])
+        approach = st.radio("approach", ["open", "videoscopic", "robotic"])
         optype = st.radio("optype", ["colorectal", "stomach", "vascular", "transplantation", "minor resection",
                                     "hepatic", "biliary/pancreas", "major resection", "thyroid", "breast", "others"
                                     ])
 
     vars = {"age": age, "sex":sex, "bmi":bmi, "asa":asa, "emop":emop, "optype":optype, "preop_dm":preop_dm,
-            "approach":approach, "preop_htn":preop_htn, "preop_pft":preop_pft, "preop_hb":preop_hb,
-            "intraop_colloid":intraop_colloid, "intraop_ppf":intraop_ppf}
+            "approach":approach, "preop_htn":preop_htn, "preop_pft":preop_pft, "preop_hb":preop_hb}
     
-    # if COL_INPUT is not None and len(COL_INPUT) > 0:
-    #     col_num = 3
-    #     cols = st.columns(col_num)
-    #     for i, c in enumerate(COL_INPUT):
-    #         with cols[i % col_num]:
-    #             num_input = st.number_input(f"Please input {c}", value=0, format="%d", key=c)
-    #             vars.loc[0, f'{c}'] = num_input
-    #             # vars.append(num_input)
 
     with cols[0]:
         btn_predict = st.button("Do Predict")
@@ -429,3 +405,5 @@ def setup_selectors():
 if __name__ == "__main__":
     do_processing()
     setup_selectors()
+
+            
