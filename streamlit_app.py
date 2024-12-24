@@ -399,8 +399,10 @@ def setup_selectors():
 
     with cols[0]:
         btn_predict = st.button("Do Predict")
-    if btn_predict:
+    if btn_predict and not st.session_state.get("setup_in_progress", False):
         do_predict()
+    # if btn_predict:
+    #     do_predict()
 
 if __name__ == "__main__":
     do_processing()
