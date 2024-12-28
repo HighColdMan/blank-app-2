@@ -339,8 +339,7 @@ def do_processing():
         st.pyplot(plt)
 
 
-def do_predict():
-    global vars
+def do_predict(vars):
     global lre, lda, ada, mlp
     
     scaler = StandardScaler()
@@ -374,7 +373,6 @@ def do_predict():
 
 
 def setup_selectors():
-    global vars, btn_predict
     cols = st.columns(2)
     with cols[0]:
 
@@ -394,20 +392,22 @@ def setup_selectors():
                                     "hepatic", "biliary/pancreas", "major resection", "thyroid", "breast", "others"
                                     ])
 
-    vars = {"age": age, "sex":sex, "bmi":bmi, "asa":asa, "emop":emop, "optype":optype, "preop_dm":preop_dm,
+    var = {"age": age, "sex":sex, "bmi":bmi, "asa":asa, "emop":emop, "optype":optype, "preop_dm":preop_dm,
             "approach":approach, "preop_htn":preop_htn, "preop_pft":preop_pft, "preop_hb":preop_hb}
+
     
+    return var
 
 
 
 if __name__ == "__main__":
     do_processing()
-    setup_selectors()
+    var = setup_selectors()
     
     btn_predict = st.button("Do Predict")
 
     if btn_predict:
-        do_predict()
+        do_predict(var)
 
 
             
