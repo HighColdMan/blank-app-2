@@ -400,13 +400,12 @@ def setup_selectors():
 
     btn_predict = st.button("Do Predict")
 
-    # if btn_predict:
-    #     do_predict()
+    if btn_predict:
+        do_predict()
 
 if __name__ == "__main__":
     do_processing()
     setup_selectors()
-    if btn_predict:
-        do_predict()
+
 
             
