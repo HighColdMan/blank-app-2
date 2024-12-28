@@ -398,14 +398,16 @@ def setup_selectors():
             "approach":approach, "preop_htn":preop_htn, "preop_pft":preop_pft, "preop_hb":preop_hb}
     
 
-    btn_predict = st.button("Do Predict")
 
-    if btn_predict:
-        do_predict()
 
 if __name__ == "__main__":
     do_processing()
     setup_selectors()
+    
+    btn_predict = st.button("Do Predict")
+
+    if btn_predict:
+        do_predict()
 
 
             
