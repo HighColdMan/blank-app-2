@@ -397,8 +397,7 @@ def setup_selectors():
             "approach":approach, "preop_htn":preop_htn, "preop_pft":preop_pft, "preop_hb":preop_hb}
     
 
-    with cols[0]:
-        btn_predict = st.button("Do Predict")
+    btn_predict = st.button("Do Predict")
 
     # if btn_predict:
     #     do_predict()
