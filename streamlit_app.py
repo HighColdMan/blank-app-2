@@ -239,7 +239,8 @@ def do_processing():
     lre = MultiOutputClassifier(lre)
 
     # AdaBoost
-    ada = AdaBoostClassifier(algorithm='SAMME', n_estimators=10, random_state=42, estimator=DecisionTreeClassifier(max_depth=2, random_state=42, criterion='gini'))
+    # ada = AdaBoostClassifier(algorithm='SAMME', n_estimators=10, random_state=42, estimator=DecisionTreeClassifier(max_depth=2, random_state=42, criterion='gini'))
+    ada = AdaBoostClassifier()
     ada = MultiOutputClassifier(ada)
 
     # 线性判别分析 (Linear Discriminant Analysis, LDA)
