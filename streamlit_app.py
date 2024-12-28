@@ -406,7 +406,7 @@ def setup_selectors():
 if __name__ == "__main__":
     do_processing()
     setup_selectors()
-    if btn_predict and not st.session_state.get("setup_in_progress", False):
+    if btn_predict:
         do_predict()
 
             
